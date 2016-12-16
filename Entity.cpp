@@ -8,6 +8,7 @@
 
 
 #include "Vector3.h"
+#include "SheetSprite.hpp"
 #include <stdio.h>
 class Entity{
 public:

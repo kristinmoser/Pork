@@ -7,6 +7,8 @@
 #include <SDL_image.h>
 #include "Matrix.h"
 #include "ShaderProgram.h"
+#include "Entity.h"
+#include "SheetSprite.hpp"
 #include <vector>
 
 

@@ -7,8 +7,12 @@
 //
 
 #include "SheetSprite.hpp"
+#include "ShaderProgram.h"
 
-SheetSprite::Draw(<#ShaderProgram program#>){
+SheetSprite::SheetSprite(){}
+
+
+void SheetSprite::Draw(ShaderProgram program){
         
         glBindTexture(GL_TEXTURE_2D, texture);
         float texCoords[] = {

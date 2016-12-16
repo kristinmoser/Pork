@@ -16,8 +16,8 @@
 
 class SheetSprite {
 public:
-    SheetSprite(){}
-    SheetSprite(GLuint texture, float u, float v, float width, float height, float size): texture(texture), u(u), v(v), width(width), height(height), size(size){}
+    SheetSprite();
+    SheetSprite(GLuint texture, float u, float v, float width, float height, float size);
     void Draw(ShaderProgram program);
     float size;
     GLuint texture;
