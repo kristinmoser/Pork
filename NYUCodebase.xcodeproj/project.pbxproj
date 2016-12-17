@@ -21,6 +21,7 @@
 		D7AC03CB1DA1F8EA0050AC77 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D7AC03C91DA1F8EA0050AC77 /* Credits.rtf */; };
 		D7AC03CF1DA1F9040050AC77 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D7AC03CE1DA1F9040050AC77 /* Images.xcassets */; };
 		D7AC03D11DA1F9220050AC77 /* NYUCodebase-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D7AC03D01DA1F9220050AC77 /* NYUCodebase-Info.plist */; };
+		D7D51CD51E052B6F00BB8D48 /* concrete.png in Resources */ = {isa = PBXBuildFile; fileRef = D7D51CD41E052B6F00BB8D48 /* concrete.png */; };
 		D7EECCB01DB6D57F0027625A /* fragment_textured.glsl in Resources */ = {isa = PBXBuildFile; fileRef = D7EECCAE1DB6D57F0027625A /* fragment_textured.glsl */; };
 		D7EECCB11DB6D57F0027625A /* fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = D7EECCAF1DB6D57F0027625A /* fragment.glsl */; };
 		D7EECCB41DB6D58A0027625A /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7EECCB21DB6D58A0027625A /* Matrix.cpp */; };
@@ -53,6 +54,7 @@
 		D7AC03CA1DA1F8EA0050AC77 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
 		D7AC03CE1DA1F9040050AC77 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
 		D7AC03D01DA1F9220050AC77 /* NYUCodebase-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "NYUCodebase-Info.plist"; sourceTree = SOURCE_ROOT; };
+		D7D51CD41E052B6F00BB8D48 /* concrete.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = concrete.png; sourceTree = SOURCE_ROOT; };
 		D7EECCAE1DB6D57F0027625A /* fragment_textured.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fragment_textured.glsl; sourceTree = SOURCE_ROOT; };
 		D7EECCAF1DB6D57F0027625A /* fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; lineEnding = 0; path = fragment.glsl; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.glsl; };
 		D7EECCB21DB6D58A0027625A /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix.cpp; sourceTree = SOURCE_ROOT; };
@@ -163,6 +165,7 @@
 				D7EECCAE1DB6D57F0027625A /* fragment_textured.glsl */,
 				D7EECCAF1DB6D57F0027625A /* fragment.glsl */,
 				D7EECCB21DB6D58A0027625A /* Matrix.cpp */,
+				D7D51CD41E052B6F00BB8D48 /* concrete.png */,
 				D79579581E04D2CD004EA34D /* background.png */,
 				D79579591E04D2CD004EA34D /* balloon.png */,
 				D795795A1E04D2CD004EA34D /* porcupine.png */,
@@ -243,6 +246,7 @@
 				D7EECCBB1DB6D5990027625A /* vertex.glsl in Resources */,
 				D7EECCC91DB72DAA0027625A /* pixel_font.png in Resources */,
 				D795795D1E04D2CD004EA34D /* porcupine.png in Resources */,
+				D7D51CD51E052B6F00BB8D48 /* concrete.png in Resources */,
 				D7EECCBA1DB6D5990027625A /* vertex_textured.glsl in Resources */,
 				D7AC03D11DA1F9220050AC77 /* NYUCodebase-Info.plist in Resources */,
 			);

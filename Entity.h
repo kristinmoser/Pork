@@ -30,17 +30,23 @@
 class Entity {
 public:
     Entity();
-    Entity(Vector3 pos, Vector3 vel, Vector3 acc);
+    Entity(Vector3 pos, Vector3 vel, Vector3 acc, Vector3 scale);
+    Entity(Vector3 pos, Vector3 scale, GLuint texture);
     Vector3 position;
     Vector3 velocity;
     Vector3 acceleration;
+    Vector3 scale;
     float gravity = -2.0f;
-    float bottom;
-    float top;
-    float left;
-    float right;
-    float rotation;
+    float width = 4.0f;
+    float height = 6.0f;
     
+    float bottom = (position.y + width) * scale.y;
+    float top = (position.y - width) * scale.y;
+    float left = (position.x - width) * scale.x;
+    float right = (position.x + width) * scale.x;
+    
+    float rotation;
+
     bool isStatic;
     int type;
     bool collidedTop;
@@ -57,7 +63,7 @@ public:
         2.0f, 3.0f, //TR
         -2.0f, 3.0f //TL
     };
-    
+
     float texCoords[12] = {
         0.0, 1.0,
         1.0, 1.0,
@@ -68,4 +74,5 @@ public:
     };
     
     void draw(ShaderProgram program);
+    void update(float elapsed);
 };
