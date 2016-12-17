@@ -297,15 +297,20 @@ void UpdateGameLevel(float elapsed){
     if (player->velocity.y < -15){
         jstate = STILL;
     }
-    for (unsigned int i = 0; i < entities.size(); i++) {
-        for (unsigned int j = 0; j < platforms.size(); j++) {
-            if (entities[j]->y >= mobs[i]->y - entities[j]->height / 2 - mobs[i]->height && entities[j]->x + entities[j]->width / 2 < mobs[i]->x + mobs[i]->width / 2 && entities[j]->x - entities[j]->width / 2 > mobs[i]->x - mobs[i]->width / 2) {
+    std::cout << player->width << std::endl;
 
-                for (unsigned int k = 0; k < platforms.size(); k++) platforms[k]->velocity += 0.007f;
+        for ( int j = 0; j < platforms.size(); ++j){
+            if (!(player->bottom > platforms[j]->top || player->top < platforms[j]->bottom || player->left > platforms[j]->right || player->right < platforms[j]->left)){
+                std::cout << "colliding" << std::endl;
+                player->collidedBottom = true;
+                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (player->height /2) - (platforms[j]->height/2));
+                player->position.y += penetration + .0002;
+                player->velocity.y = 0;
+                
             }
-            break;
         }
-    }
+    
+    player->velocity.x = lerp(player->velocity.x, 0.0f, elapsed * player->friction);
     player->velocity.y -= player->acceleration.y * elapsed;
     player->position.x += player->velocity.x * elapsed;
     player->position.y += player->velocity.y * elapsed;

@@ -53,6 +53,7 @@ public:
     bool collidedBottom;
     bool collidedLeft;
     bool collidedRight;
+    float friction = -.2;
     GLuint texture;
     Matrix modelMatrix;
     float vertices[12] = {
