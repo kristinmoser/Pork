@@ -6,12 +6,23 @@
 //  Copyright © 2016 Ivan Safrin. All rights reserved.
 //
 
-#ifndef Entity_h
-#define Entity_h
+
+#ifdef _WINDOWS
+#include <GL/glew.h>
+#endif
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include <SDL_image.h>
+#include "Vector3.h"
+#include "ShaderProgram.h"
+
+#ifdef _WINDOWS
+#define RESOURCE_FOLDER ""
+#else
+#define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
+#endif
 
 
-#endif /* Entity_h */
-#include "Entity.cpp"
 
 enum EntityType {ENTITY_PLAYER, ENTITY_OUCH,
     ENTITY_NICE, ENTITY_PLATFORM};
@@ -24,10 +35,10 @@ public:
     Vector3 velocity;
     Vector3 acceleration;
     float gravity = -2.0f;
-    float bottom = position.y - texture.width/2;
-    float top = position.y + texture.width/2;
-    float left = position.x - texture.width/2;
-    float right = position.x + texture.width/2;
+    float bottom;
+    float top;
+    float left;
+    float right;
     float rotation;
     
     bool isStatic;
@@ -36,5 +47,5 @@ public:
     bool collidedBottom;
     bool collidedLeft;
     bool collidedRight;
-    Gluint texture;
+    GLuint texture;
 };

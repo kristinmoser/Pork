@@ -9,7 +9,6 @@
 #include "ShaderProgram.h"
 #include "Entity.h"
 #include "SheetSprite.hpp"
-#include "Vector3.h"
 #include <vector>
 
 
@@ -66,8 +65,9 @@ void draw(GLuint texture, float vertices[], ShaderProgram program, float texCoor
 }
 
 
-
 std::vector<Entity> entities;
+Entity * player;
+
 
 
 ShaderProgram Setup(){
@@ -83,6 +83,12 @@ ShaderProgram Setup(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     font = LoadTexture("pixel_font.png");
     background = LoadTexture("sky.png");
+    
+    player->texture = background;
+    std::cout << player->collidedBottom << std::endl;
+    
+    
+    
     projectionMatrix.setOrthoProjection(-3.0, 3.0, -2.0f, 2.0f, -1.0f, 1.0f);
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     glUseProgram(program.programID);
@@ -91,6 +97,9 @@ ShaderProgram Setup(){
     program.setViewMatrix(viewMatrix);
     return program;
 }
+
+
+
 
 
 void ProcessMainMenu(SDL_Event event) {
@@ -254,7 +263,9 @@ void Cleanup() {
     
 }
 
+
 int main() {
+   
     ShaderProgram prog = Setup();
     while(!done) {
         ProcessEvents();

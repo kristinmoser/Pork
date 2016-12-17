@@ -6,11 +6,20 @@
 //  Copyright © 2016 Ivan Safrin. All rights reserved.
 //
 
-#ifndef Vector3_h
-#define Vector3_h
+#ifdef _WINDOWS
+#include <GL/glew.h>
+#endif
+#include <SDL.h>
+#include <SDL_opengl.h>
+#include <SDL_image.h>
+#include "ShaderProgram.h"
 
+#ifdef _WINDOWS
+#define RESOURCE_FOLDER ""
+#else
+#define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
+#endif
 
-#endif /* Vector3_h */
 
 class Vector3 {
 public:
