@@ -14,7 +14,7 @@
 
 class Vector3 {
 public:
-    Vector3(float x, float y, float z) : x(x), y(y), z(z){}
+    Vector3(float x, float y, float z);
     float x;
     float y;
     float z;

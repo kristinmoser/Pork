@@ -9,6 +9,7 @@
 #include "ShaderProgram.h"
 #include "Entity.h"
 #include "SheetSprite.hpp"
+#include "Vector3.h"
 #include <vector>
 
 
@@ -18,11 +19,8 @@
 #define RESOURCE_FOLDER "NYUCodebase.app/Contents/Resources/"
 #endif
 
-////-------- SETUP ----------
 
 SDL_Window* displayWindow;
-
-////-------- GAME STATE & BOOLS -------------
 
 bool done = false;
 enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER };
@@ -32,27 +30,14 @@ bool moveRight = false;
 bool jump = false;
 
 
-////-------- BACKGROUND VERTICES & TEXTCOORDS -------
-
 GLuint background;
 GLuint font;
-GLuint sheet;
-GLuint playerText;
 
-
-
-////-------- MATRICES--------
 
 Matrix projectionMatrix;
 Matrix modelMatrix;
 Matrix viewMatrix;
 
-
-////------ EVENTS ------
-
-SDL_Event event;
-
-////------ LOAD TEXTURE ---------
 
 GLuint LoadTexture(const char * image_path) {
     SDL_Surface* surface = IMG_Load(image_path);
@@ -80,23 +65,14 @@ void draw(GLuint texture, float vertices[], ShaderProgram program, float texCoor
     
 }
 
-///------ CLASSES -------------
-
-
-
 
 
 std::vector<Entity> entities;
-Entity player;
-
-////------ SETUP ---------
-
-
 
 
 ShaderProgram Setup(){
     SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("holly jolly snowman", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 360, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("two chunks", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 360, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
@@ -106,11 +82,7 @@ ShaderProgram Setup(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     font = LoadTexture("pixel_font.png");
-    sheet = LoadTexture("sheet.png");
     background = LoadTexture("sky.png");
-    playerText = LoadTexture("p1_spritesheet.png");
-
-    
     projectionMatrix.setOrthoProjection(-3.0, 3.0, -2.0f, 2.0f, -1.0f, 1.0f);
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     glUseProgram(program.programID);
@@ -121,13 +93,7 @@ ShaderProgram Setup(){
 }
 
 
-
-
-////----------- EVENT PROCESSING ---------------
-
-void ProcessMainMenu() {
-    // our SDL event loop
-    // check input events
+void ProcessMainMenu(SDL_Event event) {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
             done = true;
@@ -139,9 +105,7 @@ void ProcessMainMenu() {
     }
 }
 
-void ProcessGame() {
-        // our SDL event loop
-        // check input events
+void ProcessGame(SDL_Event event) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
                 done = true;
@@ -150,7 +114,7 @@ void ProcessGame() {
     }
 }
 
-void ProcessGameOver(){
+void ProcessGameOver(SDL_Event event){
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
             done = true;
@@ -160,25 +124,22 @@ void ProcessGameOver(){
 }
 
 void ProcessEvents() {
-    // our SDL event loop
-    // check input events
+    SDL_Event event;
     switch (state) {
         case STATE_MAIN_MENU:
-            ProcessMainMenu();
+            ProcessMainMenu(event);
             break;
         case STATE_GAME_LEVEL:
-            ProcessGame();
+            ProcessGame(event);
             break;
         case STATE_GAME_OVER:
-            ProcessGameOver();
+            ProcessGameOver(event);
             break;
         default:
             break;
     }
 }
 
-
-///---------- RENDERING ---------
 
 void DrawText(ShaderProgram *program, int fontTexture, std::string text, float size, float spacing) {
     float texture_size = 1.0/16.0f;
@@ -256,8 +217,6 @@ void Render(ShaderProgram program) {
             break;
     }
 }
-
-////---------------- MOVEMENT & COLLISION -----------------------
 
 void UpdateMainMenu(){
 // move stuff and check for collisions

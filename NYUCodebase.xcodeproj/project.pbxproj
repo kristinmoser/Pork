@@ -12,6 +12,7 @@
 		6D5AC2D019AE6280004CB1BF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5AC2CF19AE6280004CB1BF /* OpenGL.framework */; };
 		6D5AC2D219AE6A1E004CB1BF /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5AC2D119AE6A1E004CB1BF /* SDL2_image.framework */; };
 		D7282F341E04A00D00ED16F1 /* SheetSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7282F321E04A00C00ED16F1 /* SheetSprite.cpp */; };
+		D7282F361E04A2FD00ED16F1 /* Vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7282F351E04A2FD00ED16F1 /* Vector3.cpp */; };
 		D72AF51C1E03B8C800619077 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D72AF51B1E03B8C800619077 /* Entity.cpp */; };
 		D7AC03B21DA1F8660050AC77 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D7AC03B01DA1F8660050AC77 /* InfoPlist.strings */; };
 		D7AC03BE1DA1F8A70050AC77 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7AC03BD1DA1F8A70050AC77 /* main.cpp */; };
@@ -41,6 +42,7 @@
 		D7282F311E049FD300ED16F1 /* Vector3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vector3.h; sourceTree = SOURCE_ROOT; };
 		D7282F321E04A00C00ED16F1 /* SheetSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SheetSprite.cpp; sourceTree = SOURCE_ROOT; };
 		D7282F331E04A00C00ED16F1 /* SheetSprite.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SheetSprite.hpp; sourceTree = SOURCE_ROOT; };
+		D7282F351E04A2FD00ED16F1 /* Vector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector3.cpp; sourceTree = SOURCE_ROOT; };
 		D72AF51A1E03B8B600619077 /* Entity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Entity.h; sourceTree = SOURCE_ROOT; };
 		D72AF51B1E03B8C800619077 /* Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cpp; sourceTree = SOURCE_ROOT; };
 		D7AC03B11DA1F8660050AC77 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
@@ -169,6 +171,7 @@
 				D72AF51A1E03B8B600619077 /* Entity.h */,
 				D72AF51B1E03B8C800619077 /* Entity.cpp */,
 				D7282F311E049FD300ED16F1 /* Vector3.h */,
+				D7282F351E04A2FD00ED16F1 /* Vector3.cpp */,
 			);
 			name = Code;
 			sourceTree = "<group>";
@@ -249,6 +252,7 @@
 				D7282F341E04A00D00ED16F1 /* SheetSprite.cpp in Sources */,
 				D7EECCB71DB6D5930027625A /* ShaderProgram.cpp in Sources */,
 				D7EECCB41DB6D58A0027625A /* Matrix.cpp in Sources */,
+				D7282F361E04A2FD00ED16F1 /* Vector3.cpp in Sources */,
 				D7AC03BE1DA1F8A70050AC77 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
