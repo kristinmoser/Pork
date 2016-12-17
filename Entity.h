@@ -24,18 +24,17 @@ public:
     Vector3 velocity;
     Vector3 acceleration;
     float gravity = -2.0f;
-    void calcBTLR();
-    float bottom;
-    float top;
-    float left;
-    float right;
+    float bottom = position.y - texture.width/2;
+    float top = position.y + texture.width/2;
+    float left = position.x - texture.width/2;
+    float right = position.x + texture.width/2;
     float rotation;
     
     bool isStatic;
     EntityType type;
-    
     bool collidedTop;
     bool collidedBottom;
     bool collidedLeft;
     bool collidedRight;
+    Gluint texture;
 };
