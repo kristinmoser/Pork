@@ -11,9 +11,11 @@
 		6D5A86E319AE5CD10066C1FD /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5A86E219AE5CD10066C1FD /* SDL2.framework */; };
 		6D5AC2D019AE6280004CB1BF /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5AC2CF19AE6280004CB1BF /* OpenGL.framework */; };
 		6D5AC2D219AE6A1E004CB1BF /* SDL2_image.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D5AC2D119AE6A1E004CB1BF /* SDL2_image.framework */; };
-		D7282F341E04A00D00ED16F1 /* SheetSprite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7282F321E04A00C00ED16F1 /* SheetSprite.cpp */; };
 		D7282F361E04A2FD00ED16F1 /* Vector3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7282F351E04A2FD00ED16F1 /* Vector3.cpp */; };
 		D72AF51C1E03B8C800619077 /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D72AF51B1E03B8C800619077 /* Entity.cpp */; };
+		D795795B1E04D2CD004EA34D /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = D79579581E04D2CD004EA34D /* background.png */; };
+		D795795C1E04D2CD004EA34D /* balloon.png in Resources */ = {isa = PBXBuildFile; fileRef = D79579591E04D2CD004EA34D /* balloon.png */; };
+		D795795D1E04D2CD004EA34D /* porcupine.png in Resources */ = {isa = PBXBuildFile; fileRef = D795795A1E04D2CD004EA34D /* porcupine.png */; };
 		D7AC03B21DA1F8660050AC77 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D7AC03B01DA1F8660050AC77 /* InfoPlist.strings */; };
 		D7AC03BE1DA1F8A70050AC77 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D7AC03BD1DA1F8A70050AC77 /* main.cpp */; };
 		D7AC03CB1DA1F8EA0050AC77 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = D7AC03C91DA1F8EA0050AC77 /* Credits.rtf */; };
@@ -40,11 +42,12 @@
 		6D5AC2CF19AE6280004CB1BF /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		6D5AC2D119AE6A1E004CB1BF /* SDL2_image.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_image.framework; path = ../../../../../../../../Library/Frameworks/SDL2_image.framework; sourceTree = "<group>"; };
 		D7282F311E049FD300ED16F1 /* Vector3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vector3.h; sourceTree = SOURCE_ROOT; };
-		D7282F321E04A00C00ED16F1 /* SheetSprite.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SheetSprite.cpp; sourceTree = SOURCE_ROOT; };
-		D7282F331E04A00C00ED16F1 /* SheetSprite.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SheetSprite.hpp; sourceTree = SOURCE_ROOT; };
 		D7282F351E04A2FD00ED16F1 /* Vector3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector3.cpp; sourceTree = SOURCE_ROOT; };
 		D72AF51A1E03B8B600619077 /* Entity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Entity.h; sourceTree = SOURCE_ROOT; };
 		D72AF51B1E03B8C800619077 /* Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cpp; sourceTree = SOURCE_ROOT; };
+		D79579581E04D2CD004EA34D /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = SOURCE_ROOT; };
+		D79579591E04D2CD004EA34D /* balloon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = balloon.png; sourceTree = SOURCE_ROOT; };
+		D795795A1E04D2CD004EA34D /* porcupine.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = porcupine.png; sourceTree = SOURCE_ROOT; };
 		D7AC03B11DA1F8660050AC77 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		D7AC03BD1DA1F8A70050AC77 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = main.cpp; sourceTree = SOURCE_ROOT; usesTabs = 0; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		D7AC03CA1DA1F8EA0050AC77 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
@@ -157,11 +160,12 @@
 			isa = PBXGroup;
 			children = (
 				D7EECCC81DB72DAA0027625A /* pixel_font.png */,
-				D7282F321E04A00C00ED16F1 /* SheetSprite.cpp */,
-				D7282F331E04A00C00ED16F1 /* SheetSprite.hpp */,
 				D7EECCAE1DB6D57F0027625A /* fragment_textured.glsl */,
 				D7EECCAF1DB6D57F0027625A /* fragment.glsl */,
 				D7EECCB21DB6D58A0027625A /* Matrix.cpp */,
+				D79579581E04D2CD004EA34D /* background.png */,
+				D79579591E04D2CD004EA34D /* balloon.png */,
+				D795795A1E04D2CD004EA34D /* porcupine.png */,
 				D7EECCB81DB6D5990027625A /* vertex_textured.glsl */,
 				D7EECCB91DB6D5990027625A /* vertex.glsl */,
 				D7EECCB51DB6D5930027625A /* ShaderProgram.cpp */,
@@ -230,12 +234,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7AC03CF1DA1F9040050AC77 /* Images.xcassets in Resources */,
+				D795795B1E04D2CD004EA34D /* background.png in Resources */,
 				D7EECCB01DB6D57F0027625A /* fragment_textured.glsl in Resources */,
 				D7AC03CB1DA1F8EA0050AC77 /* Credits.rtf in Resources */,
+				D795795C1E04D2CD004EA34D /* balloon.png in Resources */,
 				D7AC03B21DA1F8660050AC77 /* InfoPlist.strings in Resources */,
 				D7EECCB11DB6D57F0027625A /* fragment.glsl in Resources */,
 				D7EECCBB1DB6D5990027625A /* vertex.glsl in Resources */,
 				D7EECCC91DB72DAA0027625A /* pixel_font.png in Resources */,
+				D795795D1E04D2CD004EA34D /* porcupine.png in Resources */,
 				D7EECCBA1DB6D5990027625A /* vertex_textured.glsl in Resources */,
 				D7AC03D11DA1F9220050AC77 /* NYUCodebase-Info.plist in Resources */,
 			);
@@ -249,7 +256,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D72AF51C1E03B8C800619077 /* Entity.cpp in Sources */,
-				D7282F341E04A00D00ED16F1 /* SheetSprite.cpp in Sources */,
 				D7EECCB71DB6D5930027625A /* ShaderProgram.cpp in Sources */,
 				D7EECCB41DB6D58A0027625A /* Matrix.cpp in Sources */,
 				D7282F361E04A2FD00ED16F1 /* Vector3.cpp in Sources */,

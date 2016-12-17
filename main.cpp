@@ -23,6 +23,7 @@ SDL_Window* displayWindow;
 
 bool done = false;
 enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER };
+enum EntityType {ENTITY_PLAYER, ENTITY_OUCH, ENTITY_NICE, ENTITY_PLATFORM};
 int state = STATE_GAME_LEVEL;
 bool moveLeft = false;
 bool moveRight = false;
@@ -66,13 +67,13 @@ void draw(GLuint texture, float vertices[], ShaderProgram program, float texCoor
 
 
 std::vector<Entity> entities;
-Entity * player;
+Entity * player = new Entity(Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,0));
 
 
 
 ShaderProgram Setup(){
     SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("two chunks", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 360, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("two chunks", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 360, 640, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
@@ -82,14 +83,14 @@ ShaderProgram Setup(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     font = LoadTexture("pixel_font.png");
-    background = LoadTexture("sky.png");
-    
+    background = LoadTexture("background.png");
+
     player->texture = background;
     std::cout << player->collidedBottom << std::endl;
     
     
     
-    projectionMatrix.setOrthoProjection(-3.0, 3.0, -2.0f, 2.0f, -1.0f, 1.0f);
+    projectionMatrix.setOrthoProjection(-2.0, 2.0, -3.0f, 3.0f, -1.0f, 1.0f);
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     glUseProgram(program.programID);
     program.setModelMatrix(modelMatrix);
@@ -199,6 +200,7 @@ void RenderMainMenu(ShaderProgram program){
 void RenderGameLevel(ShaderProgram program){
     // for all game elements
     // setup transforms, render sprites
+    player->draw(program);
 
     
     
@@ -215,7 +217,6 @@ void Render(ShaderProgram program) {
     glClear(GL_COLOR_BUFFER_BIT);
     switch(state) {
         case STATE_MAIN_MENU:
-            //std::cout << "Enter Main Menu Render" << "\n";
             RenderMainMenu(program);
             break;
         case STATE_GAME_LEVEL:
