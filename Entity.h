@@ -30,12 +30,11 @@
 class Entity {
 public:
     Entity();
-    Entity(Vector3 pos, Vector3 vel, Vector3 acc, Vector3 scale);
-    Entity(Vector3 pos, Vector3 scale, GLuint texture);
+    Entity(Vector3 pos, Vector3 vel, Vector3 acc, float width, float height);
+    Entity(Vector3 pos, GLuint texture, float width, float height);
     Vector3 position;
     Vector3 velocity;
     Vector3 acceleration;
-    Vector3 scale;
     float gravity = -2.0f;
     float width;
     float height;
@@ -56,23 +55,7 @@ public:
     float friction = -.2;
     GLuint texture;
     Matrix modelMatrix;
-    float vertices[12] = {
-        -2.0f, -3.0f, //BL
-        2.0f, -3.0f, //BR
-        2.0f, 3.0f, //TR
-        -2.0f, -3.0f, //BL
-        2.0f, 3.0f, //TR
-        -2.0f, 3.0f //TL
-    };
 
-    float texCoords[12] = {
-        0.0, 1.0,
-        1.0, 1.0,
-        1.0, 0.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        0.0, 0.0
-    };
     
     void draw(ShaderProgram program);
     void update(float elapsed);

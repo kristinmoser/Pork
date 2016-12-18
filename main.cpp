@@ -61,19 +61,8 @@ GLuint LoadTexture(const char * image_path) {
     return textureID;
 }
 
-void draw(GLuint texture, float vertices[], ShaderProgram program, float texCoords[]){
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
-    glEnableVertexAttribArray(program.positionAttribute);
-    glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
-    glEnableVertexAttribArray(program.texCoordAttribute);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    
-}
-
-
 std::vector<Entity *> entities;
-Entity * player = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,0.0,0), Vector3(1.0, 1.0, 1.0));
+Entity * player = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,-4.0,0), 2.0, 0.5);
 
 std::vector<Entity *> platforms;
 
@@ -95,38 +84,32 @@ ShaderProgram Setup(){
     background = LoadTexture("background.png");
     GLuint concrete = LoadTexture("concrete.png");
     player->texture = background;
-    player->scale.x = 0.15f;
-    player->scale.y = 0.1f;
-    player->width = 4.0f * player->scale.x;
-    player->height = 6.0f * player->scale.y;
+
 
     std::cout << player->width << " " << player->height << std::endl;
     
     entities.push_back(player);
     
-    platforms.push_back(new Entity(Vector3(0.0,-10.0,0.0), Vector3(2.0,0.1,1.0), concrete)); // floor
-    platforms.push_back(new Entity(Vector3(-2.5,-8.0,0.0), Vector3(0.7,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(1.0,-6.9,0.0), Vector3(0.4,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(3.0,-4.95,0.0), Vector3(0.8,0.065,1.0), concrete)); // spike this
-    platforms.push_back(new Entity(Vector3(-1.9,-4.3,0.0), Vector3(0.5,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(2.1,-2.4,0.0), Vector3(0.86,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(-2.6,-1.4,0.0), Vector3(0.7,0.065,1.0), concrete)); // spikes on left side
-    platforms.push_back(new Entity(Vector3(1.8, 0.6,0.0), Vector3(1.35,0.065,1.0), concrete)); // spike on center
-    platforms.push_back(new Entity(Vector3(-2.2, 2.4,0.0), Vector3(0.7,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(-0.3,3.7,0.0), Vector3(0.3,0.065,1.0), concrete)); // spike under
-    platforms.push_back(new Entity(Vector3(3.0,4.0,0.0), Vector3(0.4,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(-3.3,4.9,0.0), Vector3(0.5,0.065,1.0), concrete));
-    platforms.push_back(new Entity(Vector3(2.1,5.8,0.0), Vector3(0.6,0.065,1.0), concrete)); // spike under
+   // Entity * platform = new Entity(Vector3(0.0,-5.0,0.0),concrete, 2.0, 0.1);
     
-    for (int i = 0 ; i < platforms.size(); ++i){
-        platforms[i]->width = 4.0f * platforms[i]->scale.x;
-        platforms[i]->height = 6.0f * platforms[i]->scale.y;
-    }
+    platforms.push_back(new Entity(Vector3(0.0,-5.0,0.0),concrete, 2.0, 0.1)); // floor
+    platforms.push_back(new Entity(Vector3(-2.5,-8.0,0.0),concrete, 0.7, 0.65));
+    platforms.push_back(new Entity(Vector3(1.0,-6.9,0.0), concrete, 0.4, 0.65));
+    platforms.push_back(new Entity(Vector3(3.0,-4.95,0.0),concrete, 0.8, 0.65)); // spike this
+    platforms.push_back(new Entity(Vector3(-1.9,-4.3,0.0),concrete, 0.5, 0.65));
+    platforms.push_back(new Entity(Vector3(2.1,-2.4,0.0), concrete, 0.86,0.65));
+    platforms.push_back(new Entity(Vector3(-2.6,-1.4,0.0),concrete, 0.7, 0.65)); // spikes on left side
+    platforms.push_back(new Entity(Vector3(1.8, 0.6,0.0), concrete, 1.35,0.65)); // spike on center
+    platforms.push_back(new Entity(Vector3(-2.2, 2.4,0.0),concrete, 0.7, 0.65));
+    platforms.push_back(new Entity(Vector3(-0.3,3.7,0.0), concrete, 0.3, 0.65)); // spike under
+    platforms.push_back(new Entity(Vector3(3.0,4.0,0.0),  concrete, 0.4, 0.65));
+    platforms.push_back(new Entity(Vector3(-3.3,4.9,0.0), concrete, 0.5, 0.65));
+    platforms.push_back(new Entity(Vector3(2.1,5.8,0.0),  concrete, 0.6, 0.65)); // spike under
     
     projectionMatrix.setOrthoProjection(-5.0, 5.0, -10.0f, 10.0f, -1.0f, 1.0f);
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     glUseProgram(program.programID);
-    //program.setModelMatrix(modelMatrix);
+    program.setModelMatrix(modelMatrix);
     program.setProjectionMatrix(projectionMatrix);
     program.setViewMatrix(viewMatrix);
     return program;
@@ -252,13 +235,9 @@ void RenderMainMenu(ShaderProgram program){
 void RenderGameLevel(ShaderProgram program){
     // for all game elements
     // setup transforms, render sprites
-    program.setModelMatrix(player->modelMatrix);
-    player->modelMatrix.identity();
-    player->modelMatrix.Scale(player->scale.x, player->scale.y, player->scale.z);
-    player->modelMatrix.Translate(player->position.x, player->position.y, player->position.z);
     player->draw(program);
-    for (Entity* platform : platforms) {
-        platform->draw(program);
+    for (int i = 0 ; i < platforms.size(); ++i) {
+        platforms[i]->draw(program);
     }
 
     
@@ -298,15 +277,6 @@ void UpdateGameLevel(float elapsed){
 //        entities[i]->update(elapsed);
 //    }
 
-
-    
-    for ( int i = 0; i < platforms.size(); ++i){
-        platforms[i]->bottom = platforms[i]->position.y - platforms[i]->height/2;
-        platforms[i]->top = platforms[i]->position.y + platforms[i]->height/2;
-        platforms[i]->left = platforms[i]->position.x - platforms[i]->width/2;
-        platforms[i]->right = platforms[i]->position.x + platforms[i]->width/2;
-    }
-    
 //    if (jstate == JUMPING_UP){
 //        player->velocity.y = 15.0f;
 //        jstate = JUMPING_DOWN;
@@ -320,10 +290,10 @@ void UpdateGameLevel(float elapsed){
                 std::cout << "colliding with " << j << std::endl;
                 std::cout << platforms[j]->position.x << ", " << platforms[j]->position.y << std::endl;
                 platforms[j]->collidedBottom = true;
-//                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (player->height/2) - (platforms[j]->height/2));
-//                player->position.y += penetration + .0002;
+                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (player->height/2) - (platforms[j]->height/2));
+                player->position.y += penetration + .0002;
                 player->velocity.y = 0;
-//                
+                
             }
         }
     
