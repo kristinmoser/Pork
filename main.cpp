@@ -70,16 +70,27 @@ std::vector<Entity *> platforms;
 
 
 ShaderProgram Setup(){
+
     SDL_Init(SDL_INIT_VIDEO);
-    displayWindow = SDL_CreateWindow("two chunks", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 360, 640, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("two chunks", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 640, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
 #ifdef _WINDOWS
     glewInit();
 #endif
-    glViewport(0, 0, 360, 640);
+    glViewport(0, 0, 480, 640);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    
+    projectionMatrix.setOrthoProjection(-5.0, 5.0, -10.0f, 10.0f, -1.0f, 1.0f);
+    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
+    glUseProgram(program.programID);
+    program.setModelMatrix(modelMatrix);
+    program.setProjectionMatrix(projectionMatrix);
+    program.setViewMatrix(viewMatrix);
+    
+    
     font = LoadTexture("pixel_font.png");
     background = LoadTexture("background.png");
     GLuint concrete = LoadTexture("concrete.png");
@@ -90,28 +101,21 @@ ShaderProgram Setup(){
     
     entities.push_back(player);
     
-   // Entity * platform = new Entity(Vector3(0.0,-5.0,0.0),concrete, 2.0, 0.1);
     
-    platforms.push_back(new Entity(Vector3(0.0,-5.0,0.0),concrete, 2.0, 0.1)); // floor
-    platforms.push_back(new Entity(Vector3(-2.5,-8.0,0.0),concrete, 0.7, 0.65));
-    platforms.push_back(new Entity(Vector3(1.0,-6.9,0.0), concrete, 0.4, 0.65));
-    platforms.push_back(new Entity(Vector3(3.0,-4.95,0.0),concrete, 0.8, 0.65)); // spike this
-    platforms.push_back(new Entity(Vector3(-1.9,-4.3,0.0),concrete, 0.5, 0.65));
-    platforms.push_back(new Entity(Vector3(2.1,-2.4,0.0), concrete, 0.86,0.65));
-    platforms.push_back(new Entity(Vector3(-2.6,-1.4,0.0),concrete, 0.7, 0.65)); // spikes on left side
-    platforms.push_back(new Entity(Vector3(1.8, 0.6,0.0), concrete, 1.35,0.65)); // spike on center
-    platforms.push_back(new Entity(Vector3(-2.2, 2.4,0.0),concrete, 0.7, 0.65));
-    platforms.push_back(new Entity(Vector3(-0.3,3.7,0.0), concrete, 0.3, 0.65)); // spike under
-    platforms.push_back(new Entity(Vector3(3.0,4.0,0.0),  concrete, 0.4, 0.65));
-    platforms.push_back(new Entity(Vector3(-3.3,4.9,0.0), concrete, 0.5, 0.65));
-    platforms.push_back(new Entity(Vector3(2.1,5.8,0.0),  concrete, 0.6, 0.65)); // spike under
-    
-    projectionMatrix.setOrthoProjection(-5.0, 5.0, -10.0f, 10.0f, -1.0f, 1.0f);
-    ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
-    glUseProgram(program.programID);
-    program.setModelMatrix(modelMatrix);
-    program.setProjectionMatrix(projectionMatrix);
-    program.setViewMatrix(viewMatrix);
+    platforms.push_back(new Entity(Vector3(0.0,-9.7,0.0),concrete, 6.0, 0.5)); // floor
+    platforms.push_back(new Entity(Vector3(-2.5,-7.4,0.0),concrete, 2.0, 0.5));
+    platforms.push_back(new Entity(Vector3(1.0,-6.0,0.0), concrete, 2.4, 0.5));
+    platforms.push_back(new Entity(Vector3(3.0,-4.3,0.0),concrete, 2.8, 0.5)); // spike this
+    platforms.push_back(new Entity(Vector3(-1.9,-2.3,0.0),concrete, 2.5, 0.5));
+    platforms.push_back(new Entity(Vector3(2.1,-2.0,0.0), concrete, 2.86,0.5));
+    platforms.push_back(new Entity(Vector3(-2.6,-0.2,0.0),concrete, 2.7, 0.5)); // spikes on left side
+    platforms.push_back(new Entity(Vector3(1.8, 0.3,0.0), concrete, 2.35,0.5)); // spike on center
+    platforms.push_back(new Entity(Vector3(-2.2, 3.4,0.0),concrete, 2.7, 0.5));
+    platforms.push_back(new Entity(Vector3(-0.3,5.7,0.0), concrete, 2.3, 0.5)); // spike under
+    platforms.push_back(new Entity(Vector3(3.0,7.0,0.0),  concrete, 2.4, 0.5));
+    platforms.push_back(new Entity(Vector3(-3.3,9.9,0.0), concrete, 2.5, 0.5));
+    platforms.push_back(new Entity(Vector3(2.1,10.0,0.0),  concrete, 2.6, 0.5)); // spike under
+
     return program;
 }
 
@@ -253,6 +257,7 @@ void Render(ShaderProgram program) {
     //std::cout << "Entered Render" << "\n";
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    
     switch(state) {
         case STATE_MAIN_MENU:
             RenderMainMenu(program);
@@ -264,6 +269,7 @@ void Render(ShaderProgram program) {
             RenderGameOver(program);
             break;
     }
+    
 }
 
 void UpdateMainMenu(){
@@ -271,7 +277,7 @@ void UpdateMainMenu(){
 }
 
 
-void UpdateGameLevel(float elapsed){
+void UpdateGameLevel(ShaderProgram& program, float elapsed){
 // move stuff and check for collisions
 //    for (int i = 0; i < entities.size(); i ++){
 //        entities[i]->update(elapsed);
@@ -286,27 +292,28 @@ void UpdateGameLevel(float elapsed){
 //        jstate = STILL;
 //    }
         for ( int j = 0; j < platforms.size(); ++j){
-            if ((platforms[j]->bottom > player->top && platforms[j]->top < player->bottom && platforms[j]->left < player->right && platforms[j]->right > player->left)){
-                std::cout << "colliding with " << j << std::endl;
-                std::cout << platforms[j]->position.x << ", " << platforms[j]->position.y << std::endl;
-                platforms[j]->collidedBottom = true;
-                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (player->height/2) - (platforms[j]->height/2));
+            if (player->collidedWith(platforms[j])){
+                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (platforms[j]->height/2) - (player->height/2));
                 player->position.y += penetration + .0002;
                 player->velocity.y = 0;
-                
             }
         }
     
     //player->velocity.x = lerp(player->velocity.x, 0.0f, elapsed * player->friction);
     player->update(elapsed);
-
+    for (Entity * things : platforms){
+        things->update(elapsed);
+    }
+    viewMatrix.identity();
+    viewMatrix.Translate(-player->position.x, -player->position.y, 0);
+    program.setViewMatrix(viewMatrix);
 
     
 }
 
 
 
-void Update() {
+void Update(ShaderProgram program) {
     // move stuff and check for collisions
     ticks = (float) SDL_GetTicks()/1000.0f;
     elapsed = ticks - lastFrameTicks;
@@ -323,9 +330,9 @@ void Update() {
             }
             while (fixedElapsed >= FIXED_TIMESTEP) {
                 fixedElapsed -= FIXED_TIMESTEP;
-                UpdateGameLevel(FIXED_TIMESTEP);
+                UpdateGameLevel(program, FIXED_TIMESTEP);
             }
-            UpdateGameLevel(fixedElapsed);
+            UpdateGameLevel(program, fixedElapsed);
             break;
     }
 }
@@ -343,7 +350,7 @@ int main() {
     ShaderProgram prog = Setup();
     while(!done) {
         ProcessEvents();
-        Update();
+        Update(prog);
         Render(prog);
         SDL_GL_SwapWindow(displayWindow);
     }

@@ -59,4 +59,5 @@ public:
     
     void draw(ShaderProgram program);
     void update(float elapsed);
+    bool collidedWith(Entity* entity);
 };

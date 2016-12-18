@@ -12,13 +12,14 @@
 
 Entity::Entity(): position(Vector3(0,0,0)), velocity(Vector3(0,0,0)), acceleration(Vector3(0,0,0)), isStatic(false){}
 
-Entity::Entity(Vector3 pos, GLuint texture, float width, float height) :position(pos), velocity(Vector3(0,0,0)), acceleration(Vector3(0,0,0)), texture(texture), isStatic(true){}
+Entity::Entity(Vector3 pos, GLuint texture, float width, float height) :position(pos), velocity(Vector3(0,0,0)), acceleration(Vector3(0,0,0)), width(width), height(height), texture(texture), isStatic(true){}
 
 Entity::Entity(Vector3 pos, Vector3 vel, Vector3 acc, float width, float height) :position(pos), velocity(vel), acceleration(acc), isStatic(false), width(width), height(height){}
 
 void Entity::draw(ShaderProgram program){
-    program.setModelMatrix(modelMatrix);
+
     modelMatrix.identity();
+        program.setModelMatrix(modelMatrix);
     modelMatrix.Translate(position.x, position.y, position.z);
 
     float half_width = width / 2.0f;
@@ -46,10 +47,11 @@ void Entity::draw(ShaderProgram program){
     glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
     glEnableVertexAttribArray(program.texCoordAttribute);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(program.positionAttribute);
+    glDisableVertexAttribArray(program.texCoordAttribute);
 }
 
 void Entity::update(float elapsed){
-    std::cout << "POSITION:" << position.y << std::endl;
     bottom = position.y - height/2;
     top = position.y + height/2;
     left = position.x - width/2;
@@ -64,4 +66,14 @@ void Entity::update(float elapsed){
     position.z += velocity.z * elapsed;
     
     
+}
+
+bool Entity::collidedWith(Entity* entity){
+    if (!(bottom < entity->top ||  entity->bottom < top ||  entity->right < left || right < entity->left)){
+        std::cout << "collision" << std::endl;
+        collidedBottom = true;
+         return true;
+    }
+    return false;
+   
 }
