@@ -37,13 +37,13 @@ public:
     Vector3 acceleration;
     Vector3 scale;
     float gravity = -2.0f;
-    float width = 4.0f;
-    float height = 6.0f;
+    float width;
+    float height;
     
-    float bottom = (position.y + width) * scale.y;
-    float top = (position.y - width) * scale.y;
-    float left = (position.x - width) * scale.x;
-    float right = (position.x + width) * scale.x;
+    float bottom;
+    float top;
+    float left;
+    float right;
     
     float rotation;
 

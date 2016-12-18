@@ -73,7 +73,7 @@ void draw(GLuint texture, float vertices[], ShaderProgram program, float texCoor
 
 
 std::vector<Entity *> entities;
-Entity * player = new Entity(Vector3(0,0,0), Vector3(0,1.0,0), Vector3(0,6.0,0), Vector3(1.0, 1.0, 1.0));
+Entity * player = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,0.0,0), Vector3(1.0, 1.0, 1.0));
 
 std::vector<Entity *> platforms;
 
@@ -95,9 +95,13 @@ ShaderProgram Setup(){
     background = LoadTexture("background.png");
     GLuint concrete = LoadTexture("concrete.png");
     player->texture = background;
-    std::cout << player->collidedBottom << std::endl;
     player->scale.x = 0.15f;
     player->scale.y = 0.1f;
+    player->width = 4.0f * player->scale.x;
+    player->height = 6.0f * player->scale.y;
+
+    std::cout << player->width << " " << player->height << std::endl;
+    
     entities.push_back(player);
     
     platforms.push_back(new Entity(Vector3(0.0,-10.0,0.0), Vector3(2.0,0.1,1.0), concrete)); // floor
@@ -114,11 +118,15 @@ ShaderProgram Setup(){
     platforms.push_back(new Entity(Vector3(-3.3,4.9,0.0), Vector3(0.5,0.065,1.0), concrete));
     platforms.push_back(new Entity(Vector3(2.1,5.8,0.0), Vector3(0.6,0.065,1.0), concrete)); // spike under
     
+    for (int i = 0 ; i < platforms.size(); ++i){
+        platforms[i]->width = 4.0f * platforms[i]->scale.x;
+        platforms[i]->height = 6.0f * platforms[i]->scale.y;
+    }
     
     projectionMatrix.setOrthoProjection(-5.0, 5.0, -10.0f, 10.0f, -1.0f, 1.0f);
     ShaderProgram program(RESOURCE_FOLDER "vertex_textured.glsl", RESOURCE_FOLDER "fragment_textured.glsl");
     glUseProgram(program.programID);
-    program.setModelMatrix(modelMatrix);
+    //program.setModelMatrix(modelMatrix);
     program.setProjectionMatrix(projectionMatrix);
     program.setViewMatrix(viewMatrix);
     return program;
@@ -289,31 +297,38 @@ void UpdateGameLevel(float elapsed){
 //    for (int i = 0; i < entities.size(); i ++){
 //        entities[i]->update(elapsed);
 //    }
-    if (jstate == JUMPING_UP){
-        player->velocity.y = 15.0f;
-        jstate = JUMPING_DOWN;
-        
-    }
-    if (player->velocity.y < -15){
-        jstate = STILL;
-    }
-    std::cout << player->width << std::endl;
 
+
+    
+    for ( int i = 0; i < platforms.size(); ++i){
+        platforms[i]->bottom = platforms[i]->position.y - platforms[i]->height/2;
+        platforms[i]->top = platforms[i]->position.y + platforms[i]->height/2;
+        platforms[i]->left = platforms[i]->position.x - platforms[i]->width/2;
+        platforms[i]->right = platforms[i]->position.x + platforms[i]->width/2;
+    }
+    
+//    if (jstate == JUMPING_UP){
+//        player->velocity.y = 15.0f;
+//        jstate = JUMPING_DOWN;
+//        
+//    }
+//    if (player->velocity.y < -15){
+//        jstate = STILL;
+//    }
         for ( int j = 0; j < platforms.size(); ++j){
-            if (!(player->bottom > platforms[j]->top || player->top < platforms[j]->bottom || player->left > platforms[j]->right || player->right < platforms[j]->left)){
-                std::cout << "colliding" << std::endl;
-                player->collidedBottom = true;
-                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (player->height /2) - (platforms[j]->height/2));
-                player->position.y += penetration + .0002;
+            if ((platforms[j]->bottom > player->top && platforms[j]->top < player->bottom && platforms[j]->left < player->right && platforms[j]->right > player->left)){
+                std::cout << "colliding with " << j << std::endl;
+                std::cout << platforms[j]->position.x << ", " << platforms[j]->position.y << std::endl;
+                platforms[j]->collidedBottom = true;
+//                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (player->height/2) - (platforms[j]->height/2));
+//                player->position.y += penetration + .0002;
                 player->velocity.y = 0;
-                
+//                
             }
         }
     
-    player->velocity.x = lerp(player->velocity.x, 0.0f, elapsed * player->friction);
-    player->velocity.y -= player->acceleration.y * elapsed;
-    player->position.x += player->velocity.x * elapsed;
-    player->position.y += player->velocity.y * elapsed;
+    //player->velocity.x = lerp(player->velocity.x, 0.0f, elapsed * player->friction);
+    player->update(elapsed);
 
 
     
