@@ -25,7 +25,7 @@ SDL_Window* displayWindow;
 
 bool done = false;
 enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER };
-enum EntityType {ENTITY_PLAYER, ENTITY_OUCH, ENTITY_NICE, ENTITY_PLATFORM};
+enum EntityType {ENTITY_player1, ENTITY_OUCH, ENTITY_NICE, ENTITY_PLATFORM};
 enum JumpState {JUMPING_UP, JUMPING_DOWN, STILL };
 int jstate = STILL;
 int state = STATE_GAME_LEVEL;
@@ -62,7 +62,8 @@ GLuint LoadTexture(const char * image_path) {
 }
 
 std::vector<Entity *> entities;
-Entity * player = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,-4.0,0), 2.0, 0.5);
+Entity * player1 = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,-4.0,0), 1.0, 1.0);
+Entity * player2 = new Entity(Vector3(0,-2,0), Vector3(0,0.0,0), Vector3(0,-4.0,0), 1.0, 1.0);
 
 std::vector<Entity *> platforms;
 
@@ -94,12 +95,11 @@ ShaderProgram Setup(){
     font = LoadTexture("pixel_font.png");
     background = LoadTexture("background.png");
     GLuint concrete = LoadTexture("concrete.png");
-    player->texture = background;
-
-
-    std::cout << player->width << " " << player->height << std::endl;
+    player1->texture = background;
+    player2->texture = background;
     
-    entities.push_back(player);
+    entities.push_back(player1);
+    entities.push_back(player2);
     
     
     platforms.push_back(new Entity(Vector3(0.0,-9.7,0.0),concrete, 6.0, 0.5)); // floor
@@ -143,24 +143,38 @@ void ProcessGame(SDL_Event event) {
                 done = true;
             }
             else if (event.type == SDL_KEYDOWN){
-                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT){
-                    
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT){
-                    
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_UP){
-
-                    if (jstate == STILL){
-                        jstate = JUMPING_UP;
+                //player1 controls
+                    if (event.key.keysym.scancode == SDL_SCANCODE_LEFT){
+                        player1->velocity.x = -3.0f;
+   
                     }
-                    
+                    if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT){
+                        player1->velocity.x = 3.0f;
+
+                    }
+                    if (event.key.keysym.scancode == SDL_SCANCODE_UP){
+                        player1->velocity.y = 15.0f;
+
+                    }
+                    if (event.key.keysym.scancode == SDL_SCANCODE_DOWN){
+                        player1->velocity.y = -5.0f;
+
+                    }
+                //player2
+                if (event.key.keysym.scancode == SDL_SCANCODE_A){
+                    player2->velocity.x = -3.0f;
                 }
-                if (event.key.keysym.scancode == SDL_SCANCODE_DOWN){
-                    
+                if (event.key.keysym.scancode == SDL_SCANCODE_D){
+                    player2->velocity.x = 3.0f;
+                }
+                if (event.key.keysym.scancode == SDL_SCANCODE_W){
+                    player2->velocity.y = 15.0f;
+                }
+                if (event.key.keysym.scancode == SDL_SCANCODE_S){
+                    player2->velocity.y = -5.0f;
+                }
                 }
             }
-        }
 }
 
 void ProcessGameOver(SDL_Event event){
@@ -236,13 +250,43 @@ void RenderMainMenu(ShaderProgram program){
     glDisableVertexAttribArray(program.texCoordAttribute);
 }
 
+void drawLine(ShaderProgram program){
+    
+    modelMatrix.identity();
+    program.setModelMatrix(modelMatrix);
+    
+    float vertices[] =
+    {
+        player1->position.x, player1->position.y,
+        player2->position.x, player2->position.y
+    };
+    float texCoords[] = {
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        0.0, 0.0
+    };
+    
+    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+    glEnableVertexAttribArray(program.positionAttribute);
+    glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+    glEnableVertexAttribArray(program.texCoordAttribute);
+    glDrawArrays(GL_LINES, 0, 2);
+    glDisableVertexAttribArray(program.positionAttribute);
+    glDisableVertexAttribArray(program.texCoordAttribute);
+}
+
 void RenderGameLevel(ShaderProgram program){
     // for all game elements
     // setup transforms, render sprites
-    player->draw(program);
+    player1->draw(program);
+    player2->draw(program);
     for (int i = 0 ; i < platforms.size(); ++i) {
         platforms[i]->draw(program);
     }
+    drawLine(program);
 
     
     
@@ -253,6 +297,7 @@ void RenderGameOver(ShaderProgram program){
     glDisableVertexAttribArray(program.positionAttribute);
     glDisableVertexAttribArray(program.texCoordAttribute);
 }
+
 void Render(ShaderProgram program) {
     //std::cout << "Entered Render" << "\n";
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -284,29 +329,33 @@ void UpdateGameLevel(ShaderProgram& program, float elapsed){
 //    }
 
 //    if (jstate == JUMPING_UP){
-//        player->velocity.y = 15.0f;
+//        player1->velocity.y = 15.0f;
 //        jstate = JUMPING_DOWN;
 //        
 //    }
-//    if (player->velocity.y < -15){
+//    if (player1->velocity.y < -15){
 //        jstate = STILL;
 //    }
         for ( int j = 0; j < platforms.size(); ++j){
-            if (player->collidedWith(platforms[j])){
-                float penetration = fabsf((player->position.y - platforms[j]->position.y) - (platforms[j]->height/2) - (player->height/2));
-                player->position.y += penetration + .0002;
-                player->velocity.y = 0;
+            for (int k = 0; k < entities.size(); ++k){
+                if (entities[k]->collidedWith(platforms[j])){
+                    float penetration = fabsf((entities[k]->position.y - platforms[j]->position.y) - (platforms[j]->height/2) - (entities[k]->height/2));
+                    entities[k]->position.y += penetration + .0002;
+                    entities[k]->velocity.y = 0;
+            }
             }
         }
-    
-    //player->velocity.x = lerp(player->velocity.x, 0.0f, elapsed * player->friction);
-    player->update(elapsed);
+
+    //player1->velocity.x = lerp(player1->velocity.x, 0.0f, elapsed * player1->friction);
+    for (Entity * player : entities){
+        player->update(elapsed);
+    }
     for (Entity * things : platforms){
         things->update(elapsed);
     }
-    viewMatrix.identity();
-    viewMatrix.Translate(-player->position.x, -player->position.y, 0);
-    program.setViewMatrix(viewMatrix);
+    //viewMatrix.identity();
+    //viewMatrix.Translate(-player1->position.x, -player1->position.y, 0);
+    //program.setViewMatrix(viewMatrix);
 
     
 }

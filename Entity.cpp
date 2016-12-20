@@ -69,7 +69,7 @@ void Entity::update(float elapsed){
 }
 
 bool Entity::collidedWith(Entity* entity){
-    if (!(bottom < entity->top ||  entity->bottom < top ||  entity->right < left || right < entity->left)){
+    if (!(bottom > entity->top ||  top < entity->bottom || left > entity->right || right < entity->left)){
         std::cout << "collision" << std::endl;
         collidedBottom = true;
          return true;
