@@ -35,7 +35,6 @@ public:
     Vector3 position;
     Vector3 velocity;
     Vector3 acceleration;
-    float gravity = -2.0f;
     float width;
     float height;
     
@@ -45,19 +44,21 @@ public:
     float right;
     
     float rotation;
-
+    
     bool isStatic;
     int type;
     bool collidedTop;
     bool collidedBottom;
     bool collidedLeft;
     bool collidedRight;
-    float friction = -.2;
+    float friction = 2.0;
     GLuint texture;
     Matrix modelMatrix;
-
+    
     
     void draw(ShaderProgram program);
     void update(float elapsed);
-    bool collidedWith(Entity* entity);
+    void collide(Entity* entity);
+    //bool collideX(Entity* entity);
+    //bool collideY(Entity* entity);
 };

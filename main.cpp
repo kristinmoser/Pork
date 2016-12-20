@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <SDL_image.h>
+#include <SDL2_mixer/SDL_mixer.h>
 #include "Matrix.h"
 #include "ShaderProgram.h"
 #include "Entity.h"
@@ -62,16 +63,14 @@ GLuint LoadTexture(const char * image_path) {
 }
 
 std::vector<Entity *> entities;
-Entity * player1 = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,-4.0,0), 1.0, 1.0);
-Entity * player2 = new Entity(Vector3(0,-2,0), Vector3(0,0.0,0), Vector3(0,-4.0,0), 1.0, 1.0);
+Entity * player1 = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
+Entity * player2 = new Entity(Vector3(0,-2,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
+Entity * icePower = new Entity(Vector3(0,-2,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
 
 std::vector<Entity *> platforms;
 
-
-
-
 ShaderProgram Setup(){
-
+    
     SDL_Init(SDL_INIT_VIDEO);
     displayWindow = SDL_CreateWindow("two chunks", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 480, 640, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
@@ -115,15 +114,9 @@ ShaderProgram Setup(){
     platforms.push_back(new Entity(Vector3(3.0,7.0,0.0),  concrete, 2.4, 0.5));
     platforms.push_back(new Entity(Vector3(-3.3,9.9,0.0), concrete, 2.5, 0.5));
     platforms.push_back(new Entity(Vector3(2.1,10.0,0.0),  concrete, 2.6, 0.5)); // spike under
-
+    
     return program;
 }
-
-
-float lerp(float v0, float v1, float t) {
-    return (1.0f - t) * v0 + t * v1;
-}
-
 
 void ProcessMainMenu(SDL_Event event) {
     while (SDL_PollEvent(&event)) {
@@ -138,43 +131,49 @@ void ProcessMainMenu(SDL_Event event) {
 }
 
 void ProcessGame(SDL_Event event) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-                done = true;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+            done = true;
+        }
+        else if (event.type == SDL_KEYDOWN){
+            //player1 controls
+            if (event.key.keysym.scancode == SDL_SCANCODE_LEFT){
+                player1->velocity.x = -4.0f;
             }
-            else if (event.type == SDL_KEYDOWN){
-                //player1 controls
-                    if (event.key.keysym.scancode == SDL_SCANCODE_LEFT){
-                        player1->velocity.x = -3.0f;
-   
-                    }
-                    if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT){
-                        player1->velocity.x = 3.0f;
-
-                    }
-                    if (event.key.keysym.scancode == SDL_SCANCODE_UP){
-                        player1->velocity.y = 15.0f;
-
-                    }
-                    if (event.key.keysym.scancode == SDL_SCANCODE_DOWN){
-                        player1->velocity.y = -5.0f;
-
-                    }
-                //player2
-                if (event.key.keysym.scancode == SDL_SCANCODE_A){
-                    player2->velocity.x = -3.0f;
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_D){
-                    player2->velocity.x = 3.0f;
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_W){
-                    player2->velocity.y = 15.0f;
-                }
-                if (event.key.keysym.scancode == SDL_SCANCODE_S){
-                    player2->velocity.y = -5.0f;
-                }
-                }
+            if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT){
+                player1->velocity.x = 4.0f;
+                
             }
+            if (event.key.keysym.scancode == SDL_SCANCODE_UP){
+                player1->velocity.y = 9.0f;
+                Mix_Chunk* jumpSound;
+                jumpSound = Mix_LoadWAV("jump.wav");
+                Mix_PlayChannel( -1, jumpSound, 0);
+                
+            }
+            if (event.key.keysym.scancode == SDL_SCANCODE_DOWN){
+                player1->velocity.y = -5.0f;
+                
+            }
+            //player2
+            if (event.key.keysym.scancode == SDL_SCANCODE_A){
+                player2->velocity.x = -4.0f;
+            }
+            if (event.key.keysym.scancode == SDL_SCANCODE_D){
+                player2->velocity.x = 4.0f;
+            }
+            if (event.key.keysym.scancode == SDL_SCANCODE_W){
+                player2->velocity.y = 9.0f;
+                Mix_Chunk* jumpSound2;
+                jumpSound2 = Mix_LoadWAV("jump2.wav");
+                Mix_PlayChannel( -1, jumpSound2, 0);
+
+            }
+            if (event.key.keysym.scancode == SDL_SCANCODE_S){
+                player2->velocity.y = -5.0f;
+            }
+        }
+    }
 }
 
 void ProcessGameOver(SDL_Event event){
@@ -190,16 +189,16 @@ void ProcessEvents() {
     SDL_Event event;
     switch (state) {
         case STATE_MAIN_MENU:
-            ProcessMainMenu(event);
-            break;
+        ProcessMainMenu(event);
+        break;
         case STATE_GAME_LEVEL:
-            ProcessGame(event);
-            break;
+        ProcessGame(event);
+        break;
         case STATE_GAME_OVER:
-            ProcessGameOver(event);
-            break;
+        ProcessGameOver(event);
+        break;
         default:
-            break;
+        break;
     }
 }
 
@@ -245,7 +244,7 @@ void DrawText(ShaderProgram *program, int fontTexture, std::string text, float s
 void RenderMainMenu(ShaderProgram program){
     // for all main menu elements
     // setup transforms, render sprites
-
+    
     glDisableVertexAttribArray(program.positionAttribute);
     glDisableVertexAttribArray(program.texCoordAttribute);
 }
@@ -287,13 +286,12 @@ void RenderGameLevel(ShaderProgram program){
         platforms[i]->draw(program);
     }
     drawLine(program);
-
     
     
 }
 
 void RenderGameOver(ShaderProgram program){
-
+    
     glDisableVertexAttribArray(program.positionAttribute);
     glDisableVertexAttribArray(program.texCoordAttribute);
 }
@@ -305,58 +303,42 @@ void Render(ShaderProgram program) {
     
     switch(state) {
         case STATE_MAIN_MENU:
-            RenderMainMenu(program);
-            break;
+        RenderMainMenu(program);
+        break;
         case STATE_GAME_LEVEL:
-            RenderGameLevel(program);
-            break;
+        RenderGameLevel(program);
+        break;
         case STATE_GAME_OVER:
-            RenderGameOver(program);
-            break;
+        RenderGameOver(program);
+        break;
     }
     
 }
 
 void UpdateMainMenu(){
-// move stuff and check for collisions
+    // move stuff and check for collisions
 }
 
 
 void UpdateGameLevel(ShaderProgram& program, float elapsed){
-// move stuff and check for collisions
-//    for (int i = 0; i < entities.size(); i ++){
-//        entities[i]->update(elapsed);
-//    }
-
-//    if (jstate == JUMPING_UP){
-//        player1->velocity.y = 15.0f;
-//        jstate = JUMPING_DOWN;
-//        
-//    }
-//    if (player1->velocity.y < -15){
-//        jstate = STILL;
-//    }
-        for ( int j = 0; j < platforms.size(); ++j){
-            for (int k = 0; k < entities.size(); ++k){
-                if (entities[k]->collidedWith(platforms[j])){
-                    float penetration = fabsf((entities[k]->position.y - platforms[j]->position.y) - (platforms[j]->height/2) - (entities[k]->height/2));
-                    entities[k]->position.y += penetration + .0002;
-                    entities[k]->velocity.y = 0;
-            }
-            }
+    for ( int j = 0; j < platforms.size(); ++j){
+        for (int k = 0; k < entities.size(); ++k){
+            entities[k]->collide(platforms[j]);
         }
-
-    //player1->velocity.x = lerp(player1->velocity.x, 0.0f, elapsed * player1->friction);
+    }
+    
     for (Entity * player : entities){
         player->update(elapsed);
     }
+    
     for (Entity * things : platforms){
         things->update(elapsed);
     }
-    //viewMatrix.identity();
-    //viewMatrix.Translate(-player1->position.x, -player1->position.y, 0);
-    //program.setViewMatrix(viewMatrix);
-
+    
+    viewMatrix.identity();
+    viewMatrix.Translate(-player1->position.x, -player1->position.y, 0);
+    program.setViewMatrix(viewMatrix);
+    
     
 }
 
@@ -368,34 +350,40 @@ void Update(ShaderProgram program) {
     elapsed = ticks - lastFrameTicks;
     lastFrameTicks = ticks;
     fixedElapsed = elapsed;
-
+    
     switch(state) {
         case STATE_MAIN_MENU:
-            //UpdateMainMenu();
-            break;
+        //UpdateMainMenu();
+        break;
         case STATE_GAME_LEVEL:
-            if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS){
-                fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
-            }
-            while (fixedElapsed >= FIXED_TIMESTEP) {
-                fixedElapsed -= FIXED_TIMESTEP;
-                UpdateGameLevel(program, FIXED_TIMESTEP);
-            }
-            UpdateGameLevel(program, fixedElapsed);
-            break;
+        if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS){
+            fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
+        }
+        while (fixedElapsed >= FIXED_TIMESTEP) {
+            fixedElapsed -= FIXED_TIMESTEP;
+            UpdateGameLevel(program, FIXED_TIMESTEP);
+        }
+        UpdateGameLevel(program, fixedElapsed);
+        break;
     }
 }
 
 
 
 void Cleanup() {
+
     SDL_Quit();
-    
 }
 
 
 int main() {
-   
+    
+    Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 4096 );
+    Mix_Chunk* bgMusic;
+    bgMusic = Mix_LoadWAV("gamefinalBG.wav");
+    //song from https://soundcloud.com/missingsoul/8i09vwvryuvp
+    Mix_PlayChannel( -1, bgMusic, 0);
+    
     ShaderProgram prog = Setup();
     while(!done) {
         ProcessEvents();
@@ -403,6 +391,8 @@ int main() {
         Render(prog);
         SDL_GL_SwapWindow(displayWindow);
     }
+    Mix_FreeChunk(bgMusic);
+    //need to free jump chunks too
     Cleanup();
     return 0;
 }

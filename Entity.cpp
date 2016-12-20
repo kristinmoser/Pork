@@ -10,6 +10,10 @@
 
 #include <stdio.h>
 
+float lerp(float v0, float v1, float t) {
+    return (1.0f - t) * v0 + t * v1;
+}
+
 Entity::Entity(): position(Vector3(0,0,0)), velocity(Vector3(0,0,0)), acceleration(Vector3(0,0,0)), isStatic(false){}
 
 Entity::Entity(Vector3 pos, GLuint texture, float width, float height) :position(pos), velocity(Vector3(0,0,0)), acceleration(Vector3(0,0,0)), width(width), height(height), texture(texture), isStatic(true){}
@@ -17,11 +21,11 @@ Entity::Entity(Vector3 pos, GLuint texture, float width, float height) :position
 Entity::Entity(Vector3 pos, Vector3 vel, Vector3 acc, float width, float height) :position(pos), velocity(vel), acceleration(acc), isStatic(false), width(width), height(height){}
 
 void Entity::draw(ShaderProgram program){
-
+    
     modelMatrix.identity();
-        program.setModelMatrix(modelMatrix);
+    program.setModelMatrix(modelMatrix);
     modelMatrix.Translate(position.x, position.y, position.z);
-
+    
     float half_width = width / 2.0f;
     float half_height = height / 2.0f;
     float vertices[] =
@@ -56,8 +60,8 @@ void Entity::update(float elapsed){
     top = position.y + height/2;
     left = position.x - width/2;
     right = position.x + width/2;
-
-    velocity.x += acceleration.x * elapsed;
+    
+    velocity.x = lerp(velocity.x, 0.0f, elapsed * friction);
     velocity.y += acceleration.y * elapsed;
     velocity.z += acceleration.z * elapsed;
     
@@ -68,12 +72,39 @@ void Entity::update(float elapsed){
     
 }
 
-bool Entity::collidedWith(Entity* entity){
+//checks collisions and if there is
+//applies penetration in appropriate direction
+void Entity::collide(Entity* entity){
     if (!(bottom > entity->top ||  top < entity->bottom || left > entity->right || right < entity->left)){
         std::cout << "collision" << std::endl;
-        collidedBottom = true;
-         return true;
+        if (bottom > entity->top) {
+            //its bottom is colliding with entity
+            collidedBottom = true;
+            float penetration = fabsf((position.y - entity->position.y) - (entity->height/2) - height/2);
+            position.y += penetration + .0003;
+            velocity.y = 0;
+        }
+        if (top < entity->bottom) {
+            //its top is colliding with entity
+            collidedTop = true;
+            float penetration = fabsf((position.y - entity->position.y) - (entity->height/2) - height/2);
+            position.y -= penetration + .0003;
+            velocity.y = 0;
+        }
+        if (left > entity->right) {
+            //its left is colliding with entity
+            collidedLeft = true;
+            float penetration = fabsf((position.x - entity->position.x) - (entity->width/2) - width/2);
+            position.x += penetration + .0003;
+            velocity.x = 0;
+        }
+        if (right < entity->left) {
+            //its right is colliding with entity
+            collidedRight = true;
+            float penetration = fabsf((position.x - entity->position.x) - (entity->width/2) - width/2);
+            position.x -= penetration + .0003;
+            velocity.x = 0;
+        }
     }
-    return false;
-   
 }
+
