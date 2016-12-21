@@ -25,11 +25,8 @@
 SDL_Window* displayWindow;
 
 bool done = false;
-enum GameState { STATE_MAIN_MENU, STATE_GAME_LEVEL, STATE_GAME_OVER };
-enum EntityType {ENTITY_player1, ENTITY_OUCH, ENTITY_NICE, ENTITY_PLATFORM};
-enum JumpState {JUMPING_UP, JUMPING_DOWN, STILL };
-int jstate = STILL;
-int state = STATE_GAME_LEVEL;
+enum GameState { STATE_MAIN_MENU, STATE_LEVEL1, STATE_LEVEL2, STATE_LEVEL3, STATE_GAME_OVER, STATE_WIN };
+int state = STATE_MAIN_MENU;
 bool moveLeft = false;
 bool moveRight = false;
 bool jump = false;
@@ -37,8 +34,12 @@ float lastFrameTicks = 0.0f;
 float fixedElapsed;
 float ticks;
 float elapsed;
+float screenShakeTime = 0.0f;
+float screenShakeSpeed = 10.0;
+float screenShakeIntensity = 4.0f;
 GLuint background;
 GLuint font;
+Entity * winner;
 
 
 Matrix projectionMatrix;
@@ -63,11 +64,13 @@ GLuint LoadTexture(const char * image_path) {
 }
 
 std::vector<Entity *> entities;
-Entity * player1 = new Entity(Vector3(0,0,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
-Entity * player2 = new Entity(Vector3(0,-2,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
-Entity * icePower = new Entity(Vector3(0,-2,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
+Entity * player1 = new Entity(Vector3(2,-5,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
+Entity * player2 = new Entity(Vector3(-3,-5,0), Vector3(0,0.0,0), Vector3(0,-9.0,0), 1.0, 1.0);
 
-std::vector<Entity *> platforms;
+
+std::vector<Entity *> statics1;
+std::vector<Entity *> statics2;
+std::vector<Entity *> statics3;
 
 ShaderProgram Setup(){
     
@@ -92,28 +95,51 @@ ShaderProgram Setup(){
     
     
     font = LoadTexture("pixel_font.png");
-    background = LoadTexture("background.png");
+    GLuint greenSquare = LoadTexture("greenSquare.png");
+    GLuint purpleSquare = LoadTexture("purpleSquare.png");
     GLuint concrete = LoadTexture("concrete.png");
-    player1->texture = background;
-    player2->texture = background;
+    GLuint spikeText = LoadTexture("spike.png");
+    GLuint fire = LoadTexture("fire_platform.png");
+    GLuint ice = LoadTexture("ice.png");
+    GLuint winnertext = LoadTexture("cppFile.png");
+    player1->texture = greenSquare;
+    player2->texture = purpleSquare;
     
+
+    //powerUp->powerUptype = ICE_CUBE;
     entities.push_back(player1);
     entities.push_back(player2);
     
+    winner = new Entity(Vector3(2, 35, 0), winnertext, 1.0f, 1.0f, ENTITY_NICE);
+  
     
-    platforms.push_back(new Entity(Vector3(0.0,-9.7,0.0),concrete, 6.0, 0.5)); // floor
-    platforms.push_back(new Entity(Vector3(-2.5,-7.4,0.0),concrete, 2.0, 0.5));
-    platforms.push_back(new Entity(Vector3(1.0,-6.0,0.0), concrete, 2.4, 0.5));
-    platforms.push_back(new Entity(Vector3(3.0,-4.3,0.0),concrete, 2.8, 0.5)); // spike this
-    platforms.push_back(new Entity(Vector3(-1.9,-2.3,0.0),concrete, 2.5, 0.5));
-    platforms.push_back(new Entity(Vector3(2.1,-2.0,0.0), concrete, 2.86,0.5));
-    platforms.push_back(new Entity(Vector3(-2.6,-0.2,0.0),concrete, 2.7, 0.5)); // spikes on left side
-    platforms.push_back(new Entity(Vector3(1.8, 0.3,0.0), concrete, 2.35,0.5)); // spike on center
-    platforms.push_back(new Entity(Vector3(-2.2, 3.4,0.0),concrete, 2.7, 0.5));
-    platforms.push_back(new Entity(Vector3(-0.3,5.7,0.0), concrete, 2.3, 0.5)); // spike under
-    platforms.push_back(new Entity(Vector3(3.0,7.0,0.0),  concrete, 2.4, 0.5));
-    platforms.push_back(new Entity(Vector3(-3.3,9.9,0.0), concrete, 2.5, 0.5));
-    platforms.push_back(new Entity(Vector3(2.1,10.0,0.0),  concrete, 2.6, 0.5)); // spike under
+    float MIN_X = -3.5;
+    float MAX_X = 3.5;
+    float rangeX = MAX_X - MIN_X;
+
+    
+    for (int i= -5; i<30; i++) {
+        float randomX = (rangeX * ((rand() / (float) RAND_MAX)))+ MIN_X;
+        statics1.push_back(new Entity(Vector3(randomX, i * 3, 0.0), concrete, 3.0, 0.75, ENTITY_PLATFORM));
+    }
+    
+    for (int i= -5; i<30; i++) {
+        float randomX = (rangeX * ((rand() / (float) RAND_MAX)))+ MIN_X;
+        statics2.push_back(new Entity(Vector3(randomX, i * 3, 0.0), fire, 3.0, 0.75, ENTITY_PLATFORM));
+    }
+    for (int i= -5; i<30; i++) {
+        float randomX = (rangeX * ((rand() / (float) RAND_MAX)))+ MIN_X;
+        statics3.push_back(new Entity(Vector3(randomX, i * 3, 0.0), ice, 3.0, 0.75, ENTITY_PLATFORM));
+    }
+
+    statics1.push_back(winner);
+    statics2.push_back(winner);
+    statics3.push_back(winner);
+    
+    statics1.push_back(new Entity(Vector3(3.0, -3.7, 0), spikeText, 1.0f, 0.6f, ENTITY_OUCH)); // spikes
+    statics1.push_back(new Entity(Vector3(-2.8, 0.4, 0), spikeText, 1.0f, 0.6f, ENTITY_OUCH)); // spikes
+    //statics.push_back(new Entity(Vector3(-0.3,6.1, 0), spikeText, 1.0f, 0.6f, ENTITY_OUCH, true)); // spikes
+    
     
     return program;
 }
@@ -125,18 +151,21 @@ void ProcessMainMenu(SDL_Event event) {
             
         }
         else if (event.type == SDL_KEYDOWN){
-            state = STATE_GAME_LEVEL;
+            state = STATE_LEVEL1;
         }
     }
 }
 
 void ProcessGame(SDL_Event event) {
     while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
+        if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_Q)){
             done = true;
         }
         else if (event.type == SDL_KEYDOWN){
             //player1 controls
+            //if (!player1->isAlive || !player2->isAlive){
+              //  state = STATE_GAME_OVER;
+            //}
             if (event.key.keysym.scancode == SDL_SCANCODE_LEFT){
                 player1->velocity.x = -4.0f;
             }
@@ -151,8 +180,16 @@ void ProcessGame(SDL_Event event) {
                 Mix_PlayChannel( -1, jumpSound, 0);
                 
             }
-            if (event.key.keysym.scancode == SDL_SCANCODE_DOWN){
-                player1->velocity.y = -5.0f;
+            if (event.key.keysym.scancode == SDL_SCANCODE_E){
+                player1->position = Vector3(0.0, 0.5, 1.0);
+                player2->position = Vector3(0.0, 0.5, 1.0);
+                state = STATE_LEVEL2;
+                
+            }
+            if (event.key.keysym.scancode == SDL_SCANCODE_R){
+                player1->position = Vector3(0.0, 0.5, 1.0);
+                player2->position = Vector3(0.0, 0.5, 1.0);
+                state = STATE_LEVEL3;
                 
             }
             //player2
@@ -170,7 +207,7 @@ void ProcessGame(SDL_Event event) {
 
             }
             if (event.key.keysym.scancode == SDL_SCANCODE_S){
-                player2->velocity.y = -5.0f;
+
             }
         }
     }
@@ -189,16 +226,24 @@ void ProcessEvents() {
     SDL_Event event;
     switch (state) {
         case STATE_MAIN_MENU:
-        ProcessMainMenu(event);
-        break;
-        case STATE_GAME_LEVEL:
-        ProcessGame(event);
-        break;
+            ProcessMainMenu(event);
+            break;
+        case STATE_LEVEL1:
+            ProcessGame(event);
+            break;
+        case STATE_LEVEL2:
+            ProcessGame(event);
+            break;
+        case STATE_LEVEL3:
+            ProcessGame(event);
+            break;
         case STATE_GAME_OVER:
-        ProcessGameOver(event);
-        break;
+            ProcessGameOver(event);
+            break;
+        case STATE_WIN:
+            ProcessGame(event);
         default:
-        break;
+            break;
     }
 }
 
@@ -239,18 +284,36 @@ void DrawText(ShaderProgram *program, int fontTexture, std::string text, float s
     glDisableVertexAttribArray(program->texCoordAttribute);
 }
 
-
+void draw(GLuint texture, float vertices[], ShaderProgram program, float texCoords[]){
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glVertexAttribPointer(program.positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+    glEnableVertexAttribArray(program.positionAttribute);
+    glVertexAttribPointer(program.texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+    glEnableVertexAttribArray(program.texCoordAttribute);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    
+}
 
 void RenderMainMenu(ShaderProgram program){
     // for all main menu elements
     // setup transforms, render sprites
-    
+    glClearColor(0.7f, 0.9f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    modelMatrix.identity();
+    modelMatrix.Translate(-2.5, 0.0, 0.0);
+    program.setModelMatrix(modelMatrix);
+    DrawText(&program, font, "just 2 chunks", 0.55f, 0.0f);
+
+    modelMatrix.identity();
+    modelMatrix.Translate(-3.0, -0.5, 0.0);
+    program.setModelMatrix(modelMatrix);
+    DrawText(&program, font, "Press ANY key to start", 0.3f, 0.0f);
     glDisableVertexAttribArray(program.positionAttribute);
     glDisableVertexAttribArray(program.texCoordAttribute);
+
 }
 
 void drawLine(ShaderProgram program){
-    
     modelMatrix.identity();
     program.setModelMatrix(modelMatrix);
     
@@ -277,13 +340,51 @@ void drawLine(ShaderProgram program){
     glDisableVertexAttribArray(program.texCoordAttribute);
 }
 
-void RenderGameLevel(ShaderProgram program){
+void RenderGameLevel1(ShaderProgram program){
     // for all game elements
     // setup transforms, render sprites
-    player1->draw(program);
-    player2->draw(program);
-    for (int i = 0 ; i < platforms.size(); ++i) {
-        platforms[i]->draw(program);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    for (Entity * item: entities){
+            item->draw(program);
+    }
+    for (int i = 0 ; i < statics1.size(); ++i) {
+            statics1[i]->draw(program);
+        
+    }
+    drawLine(program);
+    
+    
+}
+void RenderGameLevel2(ShaderProgram program){
+    // for all game elements
+    // setup transforms, render sprites
+    glClearColor(0.2f, 0.0f, 0.f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    for (Entity * item: entities){
+        item->draw(program);
+    }
+    for (int i = 0 ; i < statics2.size(); ++i) {
+        statics2[i]->draw(program);
+        
+    }
+    drawLine(program);
+    
+    
+}
+
+void RenderGameLevel3(ShaderProgram program){
+    // for all game elements
+    // setup transforms, render sprites
+   //glClearColor(0.0f, 0.1f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    for (Entity * item: entities){
+        item->draw(program);
+    }
+    for (int i = 0 ; i < statics3.size(); ++i) {
+        statics3[i]->draw(program);
+        
     }
     drawLine(program);
     
@@ -291,6 +392,22 @@ void RenderGameLevel(ShaderProgram program){
 }
 
 void RenderGameOver(ShaderProgram program){
+    glClearColor(0.3f, 0.1f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    modelMatrix.identity();
+    modelMatrix.Translate(0, -2.0, 0.0);
+    program.setModelMatrix(modelMatrix);
+    DrawText(&program, font, "GAME OVER", .75f, 0.0f);
+    
+    glDisableVertexAttribArray(program.positionAttribute);
+    glDisableVertexAttribArray(program.texCoordAttribute);
+}
+
+void RenderWin(ShaderProgram program){
+    modelMatrix.identity();
+    modelMatrix.Translate(-3.5, -.5, 0.0);
+    program.setModelMatrix(modelMatrix);
+    DrawText(&program, font, "WIN", 0.3f, 0.0f);
     
     glDisableVertexAttribArray(program.positionAttribute);
     glDisableVertexAttribArray(program.texCoordAttribute);
@@ -298,19 +415,25 @@ void RenderGameOver(ShaderProgram program){
 
 void Render(ShaderProgram program) {
     //std::cout << "Entered Render" << "\n";
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
     
     switch(state) {
         case STATE_MAIN_MENU:
-        RenderMainMenu(program);
-        break;
-        case STATE_GAME_LEVEL:
-        RenderGameLevel(program);
-        break;
+            RenderMainMenu(program);
+            break;
+        case STATE_LEVEL1:
+            RenderGameLevel1(program);
+            break;
+        case STATE_LEVEL2:
+            RenderGameLevel2(program);
+            break;
+        case STATE_LEVEL3:
+            RenderGameLevel3(program);
+            break;
         case STATE_GAME_OVER:
-        RenderGameOver(program);
-        break;
+            RenderGameOver(program);
+            break;
+        case STATE_WIN:
+            RenderWin(program);
     }
     
 }
@@ -320,10 +443,15 @@ void UpdateMainMenu(){
 }
 
 
-void UpdateGameLevel(ShaderProgram& program, float elapsed){
-    for ( int j = 0; j < platforms.size(); ++j){
+void UpdateGameLevel1(ShaderProgram& program, float elapsed){
+    for ( int j = 0; j < statics1.size(); ++j){
         for (int k = 0; k < entities.size(); ++k){
-            entities[k]->collide(platforms[j]);
+            entities[k]->collide(statics1[j]);
+            if (entities[k]->winner){
+                entities[k]->winner = false;
+                winner->position.x = 0;
+                state = STATE_LEVEL2;
+            }
         }
     }
     
@@ -331,17 +459,75 @@ void UpdateGameLevel(ShaderProgram& program, float elapsed){
         player->update(elapsed);
     }
     
-    for (Entity * things : platforms){
+    for (Entity * things : statics1){
+            things->update(elapsed);
+    }
+    std::cout << fabsf(viewMatrix.m[3][1]) - 8 << std::endl;
+    std::cout << "PLAYER: " << player1->position.y << std::endl;
+    
+    if (player1->position.y < (fabsf(viewMatrix.m[3][1]) -12 ) || player2->position.y < (fabsf(viewMatrix.m[3][1]) - 12)){
+        state = STATE_GAME_OVER;
+    }
+
+        viewMatrix.Translate(0, 1.5*(-elapsed), 0);
+        program.setViewMatrix(viewMatrix);
+    
+
+}
+void UpdateGameLevel2(ShaderProgram& program, float elapsed){
+    for ( int j = 0; j < statics2.size(); ++j){
+        for (int k = 0; k < entities.size(); ++k){
+            entities[k]->collide(statics2[j]);
+            if (entities[k]->winner){
+                entities[k]->winner = false;
+                winner->position.x = 0;
+                state = STATE_LEVEL3;
+            }
+        }
+    }
+    
+    for (Entity * player : entities){
+        player->update(elapsed);
+    }
+    
+    for (Entity * things : statics2){
         things->update(elapsed);
     }
     
-    viewMatrix.identity();
-    viewMatrix.Translate(-player1->position.x, -player1->position.y, 0);
+    if (player1->position.y < (fabsf(viewMatrix.m[3][1]) -12 ) || player2->position.y < (fabsf(viewMatrix.m[3][1]) - 12)){
+        state = STATE_GAME_OVER;
+    }
+    viewMatrix.Translate(0, 3.5*(-elapsed), 0);
+    program.setViewMatrix(viewMatrix);
+
+    
+}
+void UpdateGameLevel3(ShaderProgram& program, float elapsed){
+    for ( int j = 0; j < statics3.size(); ++j){
+        for (int k = 0; k < entities.size(); ++k){
+            entities[k]->collide(statics3[j]);
+            if (entities[k]->winner){
+                state = STATE_WIN;
+            }
+        }
+    }
+    
+    for (Entity * player : entities){
+        player->update(elapsed);
+    }
+    
+    for (Entity * things : statics3){
+        things->update(elapsed);
+    }
+    
+    if (player1->position.y < (fabsf(viewMatrix.m[3][1]) -8 ) || player2->position.y < (fabsf(viewMatrix.m[3][1]) - 8)){
+        state = STATE_GAME_OVER;
+    }
+    viewMatrix.Translate(0, 2.5*(-elapsed), 0);
     program.setViewMatrix(viewMatrix);
     
     
 }
-
 
 
 void Update(ShaderProgram program) {
@@ -350,21 +536,44 @@ void Update(ShaderProgram program) {
     elapsed = ticks - lastFrameTicks;
     lastFrameTicks = ticks;
     fixedElapsed = elapsed;
-    
+//    screenShakeTime += elapsed;
+//    if (screenShakeTime > 2.0){
+//        screenShakeTime = 0;
+//    }
     switch(state) {
         case STATE_MAIN_MENU:
         //UpdateMainMenu();
         break;
-        case STATE_GAME_LEVEL:
+        case STATE_LEVEL1:
         if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS){
             fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
         }
         while (fixedElapsed >= FIXED_TIMESTEP) {
             fixedElapsed -= FIXED_TIMESTEP;
-            UpdateGameLevel(program, FIXED_TIMESTEP);
+            UpdateGameLevel1(program, FIXED_TIMESTEP);
         }
-        UpdateGameLevel(program, fixedElapsed);
+        UpdateGameLevel1(program, fixedElapsed);
         break;
+        case STATE_LEVEL2:
+            if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS){
+                fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
+            }
+            while (fixedElapsed >= FIXED_TIMESTEP) {
+                fixedElapsed -= FIXED_TIMESTEP;
+                UpdateGameLevel2(program, FIXED_TIMESTEP);
+            }
+            UpdateGameLevel2(program, fixedElapsed);
+            break;
+        case STATE_LEVEL3:
+            if (fixedElapsed > FIXED_TIMESTEP * MAX_TIMESTEPS){
+                fixedElapsed = FIXED_TIMESTEP * MAX_TIMESTEPS;
+            }
+            while (fixedElapsed >= FIXED_TIMESTEP) {
+                fixedElapsed -= FIXED_TIMESTEP;
+                UpdateGameLevel3(program, FIXED_TIMESTEP);
+            }
+            UpdateGameLevel3(program, fixedElapsed);
+            break;
     }
 }
 

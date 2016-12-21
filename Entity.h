@@ -24,14 +24,15 @@
 #endif
 
 
-
+enum EntityType {ENTITY_PLAYER, ENTITY_OUCH, ENTITY_NICE, ENTITY_PLATFORM};
+enum PowerUP {NOT, ICE_CUBE};
 
 
 class Entity {
 public:
     Entity();
     Entity(Vector3 pos, Vector3 vel, Vector3 acc, float width, float height);
-    Entity(Vector3 pos, GLuint texture, float width, float height);
+    Entity(Vector3 pos, GLuint texture, float width, float height, int type);
     Vector3 position;
     Vector3 velocity;
     Vector3 acceleration;
@@ -45,8 +46,12 @@ public:
     
     float rotation;
     
-    bool isStatic;
+    //bool isStatic;
+    bool isHurt; // touched an OUCH entity and will explode when this is true in dramaticDeath()
     int type;
+    bool winner;
+    //bool isAlive = false;
+    bool isInvincible = false;
     bool collidedTop;
     bool collidedBottom;
     bool collidedLeft;
@@ -59,6 +64,7 @@ public:
     void draw(ShaderProgram program);
     void update(float elapsed);
     void collide(Entity* entity);
+    void dramaticDeath(float elapsed);
     //bool collideX(Entity* entity);
     //bool collideY(Entity* entity);
 };
